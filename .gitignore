@@ -1,0 +1,39 @@
+# Ignore backup and temp files
+*~
+\#*#
+\.\#*
+
+# Object files 
+*.o
+.ko
+*.obj
+*.elf
+
+# Libraries
+.so
+.a
+
+# Auto-generated dependency files
+*.d
+
+# Log files
+*.log
+
+# autotools-generated files
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache/
+/compile
+/config.*
+/configure
+/depcomp
+/install-sh
+/libtool
+/ltmain.sh
+/m4/
+/missing
+/configure.scan
+/COPYING
+/INSTALL
+

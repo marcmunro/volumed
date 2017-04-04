@@ -1,0 +1,27 @@
+Welcome to the volumed suite of tools:
+
+volumed
+
+volumed is the volume control daemon for audiophile mpd boxes.  It has
+been specifically built for mpd boxes based on runeaudio, such as
+runeaudio, volumio and moode audio.
+
+It provides very responsive asynchronous websocket based control of
+volume and mute.  
+
+The current implementation directly supports moodeaudio and hacks have
+been provided for standard moode boxes to be able to use volumed.
+
+volumec
+
+This is a simple but powerful volumed client.  It can be run
+interactively, as a command line tool, as an interface from a
+named-pipe, or as an lirc client daemon .
+
+volumec-moode
+This is a volumed client that provides moode-specific functionality:
+specifically updating the moode database whenever volume or mute status
+changes.  It also provides dynamic configuration updates to volumed.  It
+can be run as a simple command in which case all database-specific
+configuration is (re)sent to volumed, or as a deamon in which case it
+will listen for status changes and record them to the database.
