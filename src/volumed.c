@@ -1,13 +1,40 @@
 /**
+ * @file   volumed.c
  * \code
  *     Copyright (c) 2017 Marc Munro
  *     Author:  Marc Munro
  *     License: GPL V3
  *
  * \endcode
- * @brief  
- * The volumed volume management daemon.
  *
+ */
+
+/*! \mainpage volumed
+\brief  
+The volumed volume management daemon.
+
+\version 0.1.0
+
+\section license License
+GPL version 3
+ 
+\section overview Overview
+volumed is a websocket-based server providing a responsive volume
+control for music players such as runeaudio, volumio and moode
+audio.  It allows for:
+- a more responsive web UI;
+- more responsive lirc control through the companion volumec
+   executable.
+
+It does this by:
+  - providing a fully asynchronous interface;
+  - accumulating/batching new commands when a command is already
+    running;
+  - providing a direct interface to the alsa mixer controls instead
+    of invoking amixer as a shell command.
+*/
+
+/*
  * PLAN:
  *   - doxygen headers for all functions
  *   - help/version args?
