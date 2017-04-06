@@ -10,8 +10,8 @@
  * The volumed volume management daemon.
  *
  * PLAN:
- *   - generate documentation using doxygen
  *   - doxygen headers for all functions
+ *   - help/version args?
  *   - valgrind makefile target
  *   - read config file
  *   - lint?
