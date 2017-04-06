@@ -1,5 +1,4 @@
 /**
- * @file   volumed.c
  * \code
  *     Copyright (c) 2017 Marc Munro
  *     Author:  Marc Munro
@@ -17,6 +16,7 @@
  *   - lint?
  *   - unit tests
  *   - create basic websocket service
+ *   - man page?
  */
 
 #include <stdio.h>
