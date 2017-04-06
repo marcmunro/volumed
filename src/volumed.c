@@ -1,24 +1,23 @@
-/**
- * @file   volumed.c
- * \code
+/*
  *     Copyright (c) 2017 Marc Munro
  *     Author:  Marc Munro
  *     License: GPL V3
  *
- * \endcode
- *
  */
 
-/*! \mainpage volumed
-\brief  
+/*! @mainpage volumed
+@brief  
 The volumed volume management daemon.
 
-\version 0.1.0
+@copyright
+(c) 2017 Marc Munro \n
 
-\section license License
+@par License
 GPL version 3
- 
-\section overview Overview
+
+@version 0.1.0
+
+@section overview Overview
 volumed is a websocket-based server providing a responsive volume
 control for music players such as runeaudio, volumio and moode
 audio.  It allows for:
@@ -36,7 +35,6 @@ It does this by:
 
 /*
  * PLAN:
- *   - doxygen headers for all functions
  *   - help/version args?
  *   - valgrind makefile target
  *   - read config file
@@ -50,11 +48,18 @@ It does this by:
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
-//#include <libgen.h>
-//#include <stdbool.h>
 
+
+/**
+ * @brief The invocation name by which we were launched, used in
+ * error and usage messages
+ */
 static char *progname = NULL;
 
+/**
+ * @brief Structure for containing configuration options read from the 
+ * config file or command line.
+ */
 typedef struct s_options {
     int port;
     int verbosity;
@@ -64,6 +69,14 @@ static options_t options = {8888, 0};
 
 static int verbose_flag = 0;
 
+/**
+ * @brief Safely close down \ref index, returning \p exitcode.
+ *
+ * @param exitcode (integer) code to be returned on \ref index exit.
+ *
+ * Close down and free all resources used by \ref index before exitting
+ * with exitcode.
+ */
 void
 closedown(int exitcode)
 {
@@ -71,7 +84,13 @@ closedown(int exitcode)
     exit(exitcode);
 }
 
-void
+/**
+ * @brief Show usage message and exit with \p exitcode
+ *
+ * @param exitcode (integer) code to be returned on \ref index exit.
+ *
+ */
+static void
 usage(int exitcode)
 {
     fprintf(stderr,
@@ -81,14 +100,26 @@ usage(int exitcode)
     closedown(exitcode);
 }
 
-void record_progname(char **argv)
+/**
+ * @brief Record our invocation name for use in error and usage messages.
+ *
+ * @param argv (char **) Argv as passed in to main()  We get the program
+ * name from argv[0] and store it in  #progname.
+ */
+static void
+record_progname(char **argv)
 {
     char *pname = (char *) malloc(strlen(argv[0]) + 1);
     strcpy(pname, argv[0]);
     progname = pname;
 }
 
-void
+/**
+ * @brief Record the port number of the websocket to be opened.
+ *
+ * @param optarg (char *) The string representing the port number.
+ */
+static void
 record_port(char *optarg)
 {
     options.port = atoi(optarg);
@@ -100,7 +131,13 @@ record_port(char *optarg)
     }
 }
 
-void
+/**
+ * @brief Validate and record our command line arguments.
+ *
+ * @param argc (int) The number of arguments passed to us.
+ * @param argv (char **) The array of command line arguments.
+ */
+static void
 process_args(int argc, char **argv)
 {
     static struct option option_defs[] = {
@@ -137,6 +174,12 @@ process_args(int argc, char **argv)
     }
 }
 
+/**
+ * @brief Main entry point to \ref index.
+ *
+ * @param argc (int) The number of arguments passed to us.
+ * @param argv (char **) The array of command line arguments.
+ */
 int
 main(int argc, char **argv)
 {
