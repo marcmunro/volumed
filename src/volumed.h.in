@@ -1,0 +1,25 @@
+/*
+ *     Copyright (c) 2017 Marc Munro
+ *     Author:  Marc Munro
+ *     License: GPL V3
+ *
+ */
+
+
+#define VERSION "@VERSION@"
+#define COPYRIGHT "Copyright (C) 2017 Marc Munro"
+#define WARRANTY \
+    "This is free software; see the source for copying conditions.\n" \
+    "There is NO warranty; not even for MERCHANTABILITY or FITNESS\n" \
+    "FOR A PARTICULAR PURPOSE."
+
+
+/**
+ * @brief Structure for containing configuration options read from the 
+ * config file or command line.
+ */
+typedef struct s_options {
+    int port;
+    int verbosity;
+} options_t;
+

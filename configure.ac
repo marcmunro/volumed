@@ -9,4 +9,5 @@ AC_PROG_CC
 
 
 
-AC_OUTPUT(Makefile src/Makefile Doxyfile)
+AC_OUTPUT(Makefile Doxyfile
+	  src/Makefile src/volumed.h)

@@ -35,7 +35,7 @@ It does this by:
 
 /*
  * PLAN:
- *   - help/version args?
+ *   - debian packaging
  *   - valgrind makefile target
  *   - read config file
  *   - lint?
@@ -48,6 +48,7 @@ It does this by:
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include "volumed.h"
 
 
 /**
@@ -56,18 +57,7 @@ It does this by:
  */
 static char *progname = NULL;
 
-/**
- * @brief Structure for containing configuration options read from the 
- * config file or command line.
- */
-typedef struct s_options {
-    int port;
-    int verbosity;
-} options_t;
-
 static options_t options = {8888, 0};
-
-static int verbose_flag = 0;
 
 /**
  * @brief Safely close down \ref index, returning \p exitcode.
@@ -77,7 +67,7 @@ static int verbose_flag = 0;
  * Close down and free all resources used by \ref index before exitting
  * with exitcode.
  */
-void
+static void
 closedown(int exitcode)
 {
     free(progname);
@@ -132,6 +122,18 @@ record_port(char *optarg)
 }
 
 /**
+ * @brief Show out name and version and gracefully exit.
+ *
+ */
+static void
+show_version_and_exit()
+{
+    printf("%s version: %s\n%s\n%s\n\n",
+	   progname, VERSION, COPYRIGHT, WARRANTY);
+    closedown(0);
+}
+
+/**
  * @brief Validate and record our command line arguments.
  *
  * @param argc (int) The number of arguments passed to us.
@@ -143,6 +145,7 @@ process_args(int argc, char **argv)
     static struct option option_defs[] = {
 	{"port", required_argument, NULL, 0},
 	{"verbose", no_argument, NULL, 0},
+	{"version", no_argument, NULL, 0},
 	{NULL, 0, NULL, 0}
     };
     int c;
@@ -160,6 +163,9 @@ process_args(int argc, char **argv)
 	    }
 	    else if (strcmp(option_defs[oidx].name, "verbose") == 0) {
 		options.verbosity++;
+	    }
+	    else if (strcmp(option_defs[oidx].name, "version") == 0) {
+		show_version_and_exit();
 	    }
 	    break;
 	case 'p':
