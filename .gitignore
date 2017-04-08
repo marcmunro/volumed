@@ -46,4 +46,9 @@ Makefile
 # Targets
 src/volumed
 
-
+# Package files
+/volumed*.deb
+/volumed*.dsc
+/volumed*.tar.xz
+/volumed*.build
+/volumed*.changes

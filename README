@@ -18,7 +18,7 @@ This is a simple but powerful volumed client.  It can be run
 interactively, as a command line tool, as an interface from a
 named-pipe, or as an lirc client daemon .
 
-volumec-moode
+volume-config-moode
 This is a volumed client that provides moode-specific functionality:
 specifically updating the moode database whenever volume or mute status
 changes.  It also provides dynamic configuration updates to volumed.  It

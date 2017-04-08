@@ -35,13 +35,15 @@ It does this by:
 
 /*
  * PLAN:
- *   - debian packaging
- *   - valgrind makefile target
  *   - read config file
+ *   - valgrind makefile target
  *   - lint?
  *   - unit tests
  *   - create basic websocket service
+ *   - create volumec
+ *    - create volume-config-moode
  *   - man page?
+ *   - debianize
  */
 
 #include <stdio.h>
@@ -128,7 +130,7 @@ record_port(char *optarg)
 static void
 show_version_and_exit()
 {
-    printf("%s version: %s\n%s\n%s\n\n",
+    printf("%s - volume control daemon, version: %s\n%s\n%s\n\n",
 	   progname, VERSION, COPYRIGHT, WARRANTY);
     closedown(0);
 }
