@@ -6,6 +6,8 @@
  */
 
 
+#include <stdbool.h>
+
 #define VERSION "@VERSION@"
 #define COPYRIGHT "Copyright (C) 2017 Marc Munro"
 #define WARRANTY \
@@ -14,6 +16,43 @@
     "FOR A PARTICULAR PURPOSE."
 
 
+#define DEFAULT_PORT        8888
+#define CONFIG_FILE         "/etc/volumed.conf"
+#define LOCAL_CONFIG_FILE   ".volumed.conf"
+
+
+#define MALLOC(x) checked_malloc(x, __FILE__, __LINE__)
+#define FREE(x) do {if (x) free((void *) x);} while (0)
+#define STRCPY(x,y) \
+    do {x = (char *) malloc(strlen(y)); strcpy(x, y);} while (0)
+
+#define MAX(a,b) ((a > b) ? a: b)
+
+#define FILE_BUFFER_SIZE 200
+
+/* Configuration defaults */
+
+#define CFG_NAME_VOLCURVE       "volcurve"
+#define CONFIG_VOLCURVE         true
+#define CFG_NAME_MAX_PCT        "max_pct"
+#define CONFIG_MAX_PCT          100
+#define CFG_NAME_ALSA_MIXER_NAME "alsa_mixer_name"
+#define CONFIG_ALSA_MIXER_NAME  "Digital"
+#define CFG_NAME_MPD_MIXER      "mpd_mixer"
+#define CONFIG_MPD_MIXER        "hardware"
+#define CFG_NAME_ALSA_CARD      "alsa_card_name"
+#define CONFIG_ALSA_CARD         NULL
+
+typedef enum {NONE, STRING, BOOLEAN, INTEGER} type_t;
+
+/**
+ * @brief Structure for defining configuration option names and defaults.
+ */
+typedef struct cfg_options {
+    char   *option_name;
+    type_t  option_type;
+} cfg_option_t;
+
 /**
  * @brief Structure for containing configuration options read from the 
  * config file or command line.
@@ -21,5 +60,17 @@
 typedef struct s_options {
     int port;
     int verbosity;
+    char *config_filename;
+    bool  volcurve;
+    int   max_pct;
+    char *alsa_mixer_name;
+    char *mpd_mixer;
+    char *alsa_card;
 } options_t;
+
+
+extern void closedown(int exitcode);
+extern void fail(int code, const char *fmt, ...);
+extern void *checked_malloc(size_t size, const char *file, int line);
+extern void read_config_file(options_t *options);
 

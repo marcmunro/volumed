@@ -89,7 +89,7 @@ CONFIG_CLEAN_FILES = volumed.h
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_volumed_OBJECTS = volumed.$(OBJEXT)
+am_volumed_OBJECTS = volumed.$(OBJEXT) config.$(OBJEXT)
 volumed_OBJECTS = $(am_volumed_OBJECTS)
 volumed_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -232,7 +232,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CXXFLAGS = $(INTI_CFLAGS)
-volumed_SOURCES = volumed.c volumed.h
+volumed_SOURCES = volumed.c config.c
 volumed_LDADD = $(INTI_LIBS)
 all: all-am
 
@@ -323,6 +323,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/volumed.Po@am__quote@
 
 .c.o:

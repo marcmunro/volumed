@@ -2,7 +2,6 @@ SUBDIRS = src
 
 SOURCES = $(wildcard src/*.[ch])
 
-
 DX_CLEAN = docs/html
 DX_DB = docs/doxygen_sqlite3.db
 
@@ -16,5 +15,6 @@ docs:	docs/html
 
 docs/html: Doxyfile $(SOURCES)
 	doxygen Doxyfile
+
 
 .PHONY: clean-local mostlyclean-local docs
