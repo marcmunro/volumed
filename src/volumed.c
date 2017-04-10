@@ -39,7 +39,6 @@ It does this by:
 
 /*
  * PLAN:
- *   - check docs
  *   - change some errors to warnings
  *   - unit tests
  *   - valgrind

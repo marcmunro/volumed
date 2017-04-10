@@ -191,6 +191,15 @@ static cfg_option_t cfg_options[] = {
     {NULL, NONE}
 };
 
+/**
+ * @brief Identify the #cfg_options entry for \p name.
+ * 
+ * @param name (char *) A token, returned from next_config_setting() for
+ * which we want the matching #cfg_options entry.
+ *
+ * @return (int) The index into #cfg_options for \p name, or -1 if no
+ * matching entry is found.
+ */
 static int
 get_option(const char *name)
 {
