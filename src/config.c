@@ -167,11 +167,11 @@ next_config_setting(
 	    continue;
 	}
 	if (!*p_value) {
-	    /* We have no value.  That is an error. */
-	    fail(0, "Invalid configuration entry at %s:%d\n"
-		 "\"%s\"\n", *p_line_no, filename, *p_token);
+	    /* We have no value. */
+	    fprintf(stderr,
+		    "Warning: Invalid configuration entry at %s:%d\n"
+		    "\"%s\"\n", *p_line_no, filename, *p_token);
 	    FREE(*p_token);
-	    closedown(2);
 	}
 	return f;
     }
@@ -263,9 +263,10 @@ read_config_file(options_t *options)
 		    if (!((strcmp(value, "no") == 0) ||
 			  (strcmp(value, "false") == 0)))
 		    {
-			fail(3,
-			     "Invalid value (%s) for boolean \"%s\" at %s:%d",
-			     value, token, filename, line_no);
+			fprintf(stderr,
+				"Warning: invalid value (%s) for boolean "
+				"\"%s\" at %s:%d (entry ignored)\n",
+				value, token, filename, line_no);
 		    }
 		}
 		break;
@@ -277,9 +278,10 @@ read_config_file(options_t *options)
 			ival += (c - '0');
 		    }
 		    else {
-			fail(3,
-			     "Invalid value (%s) for integer \"%s\" at %s:%d",
-			     value, token, filename, line_no);
+			fprintf(stderr,
+				"Warning: Invalid value (%s) for integer "
+				"\"%s\" at %s:%d (entry ignored)\n",
+				value, token, filename, line_no);
 		    }
 		}
 	    }
@@ -304,8 +306,9 @@ read_config_file(options_t *options)
 	    }
 	}
 	else {
-	    fail(3, "Unrecognized token \"%s\" at %s:%d", token,
-		 filename, line_no);
+	    fprintf(stderr,
+		    "Warning: Unrecognized token \"%s\" "
+		    "at %s:%d (entry ignored)\n", token, filename, line_no);
 	}
     }
     FREE(filename);
