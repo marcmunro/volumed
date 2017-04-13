@@ -35,7 +35,7 @@ open_config_file(options_t *options, char **p_filename)
 	/* Explicit config file was specified.  We *must* open this. */
 	f = fopen(name = options->config_filename, "r");
 	if (!f) {
-	    fail(2, "unable to open file: \"%s\"", name);
+	    dofail(2, "unable to open file: \"%s\"", name);
 	}
     }
     else {

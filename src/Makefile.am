@@ -2,5 +2,5 @@ bin_PROGRAMS = volumed
 
 AM_CXXFLAGS = $(INTI_CFLAGS)
 
-volumed_SOURCES = volumed.c config.c
+volumed_SOURCES = volumed.c params.c config.c
 volumed_LDADD = $(INTI_LIBS)

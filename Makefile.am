@@ -1,4 +1,6 @@
-SUBDIRS = src
+ACLOCAL_AMFLAGS = -I m4
+
+SUBDIRS = src tests
 
 SOURCES = $(wildcard src/*.[ch])
 
@@ -10,6 +12,9 @@ mostlyclean-local:
 
 clean-local:
 	-rm -f $(DX_DB)
+
+distclean-local:
+	rm -f test-driver
 
 docs:	docs/html
 
