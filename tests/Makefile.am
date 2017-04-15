@@ -11,22 +11,37 @@ check_volumed_LDADD = $(top_builddir)/src/params.o @CHECK_LIBS@ -lm -lrt
 
 # Redefine rules for check-am target so that we can check the output and
 # provide a summary.
+# NOTES:
+#    - The recursive make for check-TESTS has its output sanitised:
+#      we do not want to see recipe failed errors as they just clutter
+#      the output and make next-error functionality (in eg, emacs)
+#      less useful.
+#    - The awk script is for printing any debug output from the program
+#      being tested.
+#
 check-am: 
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	@echo $(MAKE) $(AM_MAKEFLAGS) check-TESTS
-	@$(am__set_TESTS_bases); \
-	redo_bases=`for i in $$bases; do \
-	                am__f_ok $$i.trs && am__f_ok $$i.log || echo $$i; \
+	@am__f_ok () { test -f "$$1" && test -r "$$1"; }; \
+	$(am__set_TESTS_bases); \
+	redo_logs=`for i in $$bases; do \
+	                am__f_ok $$i.log && echo $$i.log; \
 	            done`; \
-	if test -n "$$redo_bases"; then \
-	    redo_logs=`for i in $$redo_bases; do echo $$i.log; done`; \
-	    redo_results=`for i in $$redo_bases; do echo $$i.trs; done`; \
-	fi; \
-	if $(MAKE) $(AM_MAKEFLAGS) check-TESTS; then \
-	    echo; grep "^[0-9]*%: Checks" $$redo_logs; echo; \
-	else \
-	    echo; grep "[^:]*.c:[[0-9]*:" $(TEST_SUITE_LOG) | cut -d: -f1-6; \
-	    echo; grep "^[0-9]*%: Checks" $(TEST_SUITE_LOG); echo; \
-	    exit 1; \
-	fi
-
+	echo LOGS: $$redo_logs; \
+	$(MAKE) $(AM_MAKEFLAGS) check-TESTS | \
+	    grep -v '^Makefile:[0-9]*: recipe'; \
+	echo; \
+	exitcode=0; \
+	for i in $$redo_logs; do \
+	    awk '/^[0-9]*%: Checks/{exit(0)}; \
+		(do_print); \
+		 /^Running suite/ {do_print=1} ' $$i; \
+	    if ! grep "^100%: Checks" $$i >/dev/null; then \
+	        grep "[^:]*.c:[[0-9]*:" $$i | cut -d: -f1-6; \
+	        echo; \
+		exitcode=1; \
+	    fi; \
+	    grep "^[0-9]*%: Checks" $$i; \
+	    echo; \
+	done; \
+	exit $$exitcode

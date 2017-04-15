@@ -39,9 +39,8 @@ It does this by:
 
 /*
  * PLAN:
- *   - unit tests
+ *   - complete unit tests
  *   - valgrind
- *   - lint?
  *   - create basic websocket service
  *   - create volumec
  *   - create volume-config-moode

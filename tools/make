@@ -1,0 +1,21 @@
+#! /bin/bash
+# This is a wrapper for make that removes warnings for redefined
+# check-am targets.  This declutters the output from make, easing the
+# use of next-error in emacs.  This can safely be placed in a directory
+# in your $PATH.
+# 
+
+rm_from_path ()
+{
+    sed -e "s%:$1:%:%; s%^$1:%%; s%:$1$%%"
+}
+
+dir=`dirname $0`
+
+PATH=`echo $PATH | rm_from_path ${dir}`
+
+(
+    make "$@" 3>&1 1>&2 2>&3 | \
+        grep -v '^Makefile:[0-9]*: warning.*check-am' | \
+    test ${PIPESTATUS[0]} -eq 0
+) 3>&1 1>&2 2>&3

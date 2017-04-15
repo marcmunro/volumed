@@ -16,7 +16,8 @@
 #include "../src/volumed.h"
 
 #define PROGNAME "./volumed"
-#define CFGNAME "wibble"
+#define CFGNAME  "wibble"
+#define CFGNAME2 "wibble2"
 
 START_TEST(param_progname)
 {
@@ -29,8 +30,15 @@ END_TEST
 START_TEST(param_configfile)
 {
     char *argv[] = {PROGNAME, "-c", CFGNAME};
+    char *argv2[] = {PROGNAME, "-c", CFGNAME2};
     process_args(3, argv);
     ck_assert(strcmp(CFGNAME, options.config_filename) == 0);
+    printf("111: %s\n", options.config_filename);
+    process_args(3, argv2);
+    printf("222: %s\n", options.config_filename);
+    ck_assert(strcmp(CFGNAME2, options.config_filename) == 0);
+    //argv = {PROGNAME, "--config=" CFGNAME};
+    //ck_assert(strcmp(CFGNAME, options.config_filename) == 0);
 }
 END_TEST
 
