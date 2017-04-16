@@ -12,12 +12,20 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <check.h>
 #include "../src/volumed.h"
 
 #define PROGNAME "./volumed"
 #define CFGNAME  "wibble"
 #define CFGNAME2 "wibble2"
+
+FILE *
+redirect(FILE *stream, char *path)
+{
+    return(freopen(path, "a+", stream));
+}
+
 
 START_TEST(param_progname)
 {
@@ -27,6 +35,7 @@ START_TEST(param_progname)
 }
 END_TEST
 
+/* Test the handling of the --config option. */
 START_TEST(param_configfile)
 {
     char *argv[] = {PROGNAME, "-c", CFGNAME};
@@ -44,6 +53,173 @@ START_TEST(param_configfile)
 }
 END_TEST
 
+/* Test the handling of the --port option. */
+START_TEST(param_port)
+{
+    char *argv[] = {PROGNAME};
+    char *argv2[] = {PROGNAME, "-p", "8887"};
+    char *argv3[] = {PROGNAME, "--port", "8886"};
+    
+    process_args(1, argv);
+    ck_assert_int_eq(options.port, 8888);
+
+    process_args(3, argv2);
+    ck_assert_int_eq(options.port, 8887);
+
+    process_args(3, argv3);
+    ck_assert_int_eq(options.port, 8886);
+}
+END_TEST
+
+typedef void (redirect_checker_fn_t)(void);
+static FILE *my_stderr;
+static redirect_checker_fn_t *chk_redirect;
+static expected_exitcode = 0;
+
+static void
+redirect_setup(void)
+{
+    my_stderr = redirect(stderr, "stderr.log");
+    chk_redirect = NULL;
+    expected_exitcode = 0;
+}
+
+static void
+redirect_teardown(void)
+{
+    unlink("stderr.log");
+    unlink("stdout.log");
+}
+
+extern void
+closedown(int exitcode)
+{
+    if (chk_redirect) {
+	chk_redirect();
+    }
+    ck_assert_int_eq(exitcode, expected_exitcode);
+}
+
+static void
+check_usage()
+{
+    int r;
+    fflush(my_stderr);
+    r = system("grep usage: stderr.log >/dev/null") >> 8;
+
+    if (r != 0) {
+	ck_abort_msg("Usage message not found.");
+    }
+}
+
+static void
+check_no_arg_for_option()
+{
+    int r;
+    fflush(my_stderr);
+    //r = system("cat stderr.log");
+    r = system(
+	"grep \"option.*requires an argument\" stderr.log >/dev/null") >> 8;
+
+    if (r != 0) {
+	ck_abort_msg("Error message not found.");
+    }
+    check_usage();
+}
+
+static void
+check_unexpected()
+{
+    int r;
+    fflush(my_stderr);
+    //r = system("cat stderr.log");
+    r = system("grep \"unrecognized option\" stderr.log >/dev/null") >> 8;
+
+    if (r != 0) {
+	ck_abort_msg("Error message not found.");
+    }
+    check_usage();
+}
+
+START_TEST(param_missing_port)
+{
+    char *argv[] = {PROGNAME, "-p"};
+
+    /* This will result in a usage message and exit with a failure
+     * code. */
+    expected_exitcode = 2;
+    chk_redirect = check_no_arg_for_option;
+    process_args(2, argv);
+}
+END_TEST
+
+START_TEST(param_missing_config)
+{
+    char *argv[] = {PROGNAME, "--config"};
+
+    /* This will result in a usage message and exit with a failure
+     * code. */
+    expected_exitcode = 2;
+    chk_redirect = check_no_arg_for_option;
+    process_args(2, argv);
+}
+END_TEST
+
+START_TEST(param_version)
+{
+    int stdout_save = dup(STDOUT_FILENO);
+    char *argv[] = {PROGNAME, "--version"};
+    FILE *my_stdout;
+    int r;
+
+    fflush(stdout); 
+    my_stdout = redirect(stdout, "stdout.log");
+
+    process_args(2, argv);
+
+    fflush(my_stdout); 
+    dup2(stdout_save, STDOUT_FILENO); //restore the previous state of stdout
+
+    printf("grep " PROGNAME " stdout.log\n");
+    r = system(
+	"grep \"" PROGNAME ".*volume control daemon.*"
+	VERSION "\" stdout.log >/dev/null") >> 8;
+
+    if (r != 0) {
+	ck_abort_msg("version message not found.");
+    }
+    
+    r = system("grep -i Copyright stdout.log >/dev/null") >> 8;
+
+    if (r != 0) {
+	ck_abort_msg("copyright message not found.");
+    }
+}
+END_TEST
+
+START_TEST(param_verbose)
+{
+    char *argv[] = {PROGNAME, "-v", "--verbose", "--verb"};
+
+    process_args(4, argv);
+    ck_assert_int_eq(options.verbosity, 3);
+}
+END_TEST
+
+START_TEST(param_unexpected)
+{
+    char *argv[] = {PROGNAME, "--wibble"};
+
+    /* This will result in a usage message and exit with a failure
+     * code. */
+    expected_exitcode = 2;
+    chk_redirect = check_unexpected;
+    process_args(2, argv);
+}
+END_TEST
+
+
+
 static Suite *
 params_suite(void)
 {
@@ -52,11 +228,18 @@ params_suite(void)
 
     s = suite_create("Volumed");
     tc_params = tcase_create("params");
+    tcase_add_checked_fixture(tc_params, redirect_setup, redirect_teardown);
     suite_add_tcase (s, tc_params);
 
     tcase_add_test(tc_params, param_progname);
     tcase_add_test(tc_params, param_configfile);
-
+    tcase_add_test(tc_params, param_port);
+    tcase_add_test(tc_params, param_missing_port);
+    tcase_add_test(tc_params, param_missing_config);
+    tcase_add_test(tc_params, param_version);
+    tcase_add_test(tc_params, param_verbose);
+    tcase_add_test(tc_params, param_unexpected);
+ 
     return s;
 }
 
@@ -67,7 +250,7 @@ main(int argc, char *argv[])
     int number_failed;
     Suite *s;
     SRunner *sr;
-
+    
     s = params_suite();
     sr = srunner_create(s);
     

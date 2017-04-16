@@ -60,6 +60,7 @@ usage(int exitcode)
  * Close down and free all resources used by \ref index before exitting
  * with exitcode.
  */
+__attribute__((weak)) /* Enable this to be overridden in unit tests. */
 extern void
 closedown(int exitcode)
 {
