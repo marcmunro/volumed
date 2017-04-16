@@ -138,6 +138,8 @@ process_args(int argc, char **argv)
     char option_map[] = {'p', 'v', 'V', 'c'};
     int c;
     int oidx = 0;
+    optind = 0;   /* Allow for multiple invocations - this simplifies
+                   * unit tests. */
     
     record_progname(argv);
 

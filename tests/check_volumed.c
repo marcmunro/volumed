@@ -31,14 +31,16 @@ START_TEST(param_configfile)
 {
     char *argv[] = {PROGNAME, "-c", CFGNAME};
     char *argv2[] = {PROGNAME, "-c", CFGNAME2};
+    char *argv3[] = {PROGNAME, "--config=" CFGNAME};
+    
     process_args(3, argv);
     ck_assert(strcmp(CFGNAME, options.config_filename) == 0);
-    printf("111: %s\n", options.config_filename);
+
     process_args(3, argv2);
-    printf("222: %s\n", options.config_filename);
     ck_assert(strcmp(CFGNAME2, options.config_filename) == 0);
-    //argv = {PROGNAME, "--config=" CFGNAME};
-    //ck_assert(strcmp(CFGNAME, options.config_filename) == 0);
+
+    process_args(3, argv3);
+    ck_assert(strcmp(CFGNAME, options.config_filename) == 0);
 }
 END_TEST
 

@@ -15,7 +15,7 @@ dir=`dirname $0`
 PATH=`echo $PATH | rm_from_path ${dir}`
 
 (
-    make "$@" 3>&1 1>&2 2>&3 | \
-        grep -v '^Makefile:[0-9]*: warning.*check-am' | \
-    test ${PIPESTATUS[0]} -eq 0
-) 3>&1 1>&2 2>&3
+    make "$@" 3>&2 2>&1 1>&3- | 
+        grep -v '^Makefile:[0-9]*: warning.*check-am'
+    exit ${PIPESTATUS[0]}
+) 3>&2 2>&1 1>&3-

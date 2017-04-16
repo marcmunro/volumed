@@ -27,7 +27,6 @@ check-am:
 	redo_logs=`for i in $$bases; do \
 	                am__f_ok $$i.log && echo $$i.log; \
 	            done`; \
-	echo LOGS: $$redo_logs; \
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS | \
 	    grep -v '^Makefile:[0-9]*: recipe'; \
 	echo; \
@@ -45,3 +44,16 @@ check-am:
 	    echo; \
 	done; \
 	exit $$exitcode
+
+# Redefine rules for compilation of objects since by default they do
+# not properly handle objects in other directories.
+# This would probably not be an issue except that I want to be able to
+# invoke make check from the tests directory when there may be out of date
+# dependencies in the src (or other directories).  This hack simply fixes
+# the path for the dependencies.  I suspect this whole issue is another
+# example of why recursive make may be considered harmful.
+.c.o:
+	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF \
+	    `dirname $*`/$(DEPDIR)/`basename $*`.Tpo -c -o $@ $<
+	$(AM_V_at)$(am__mv) `dirname $*`/$(DEPDIR)/`basename $*`.Tpo \
+	    `dirname $*`/$(DEPDIR)/`basename $*`.Po
