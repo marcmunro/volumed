@@ -54,21 +54,6 @@ It does this by:
 
 
 /**
- * @brief Wrapper for malloc that tests result and fails if 0.
- *
- * TODO: properly document this.
- */
-void *
-checked_malloc(size_t size, const char *file, int line)
-{
-    void *res = malloc(size);
-    if (!res) {
-	dofail(2, "Unable to allocate memory of size %d at %s:%d",
-	     size, file, line);
-    }
-}
-
-/**
  * @brief Main entry point to \ref index.
  *
  * @param argc (int) The number of arguments passed to us.
@@ -78,7 +63,7 @@ int
 main(int argc, char **argv)
 {
     process_args(argc, argv);
-    read_config_file(&options);
+    read_config_file();
     printf("Port: %d, Verbosity: %d\n", options.port, options.verbosity);
     printf("volcurve: %d, max_pct: %d\n", options.volcurve, options.max_pct);
     printf("alsa_mixer: %s, mpd_mixer: %s\n",

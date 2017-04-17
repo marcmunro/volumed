@@ -32,6 +32,21 @@ options_t options = {
 
 
 /**
+ * @brief Wrapper for malloc that tests result and fails if 0.
+ *
+ * TODO: properly document this.
+ */
+void *
+checked_malloc(size_t size, const char *file, int line)
+{
+    void *res = malloc(size);
+    if (!res) {
+	dofail(2, "Unable to allocate memory of size %d at %s:%d",
+	     size, file, line);
+    }
+}
+
+/**
  * @brief Show usage message and exit with \p exitcode
  *
  * @param exitcode (integer) code to be returned on \ref index exit.

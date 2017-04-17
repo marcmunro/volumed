@@ -102,6 +102,8 @@ next_config_setting(
     int len = 0;
     int size = 100;
     
+    fflush(stdout);
+
     *p_token = idx = (char *) MALLOC(size);
     *p_value = NULL;
 
@@ -167,15 +169,18 @@ next_config_setting(
 	    continue;
 	}
 	if (!*p_value) {
+	    fflush(stdout);
 	    /* We have no value. */
 	    fprintf(stderr,
-		    "Warning: Invalid configuration entry at %s:%d\n"
-		    "\"%s\"\n", *p_line_no, filename, *p_token);
-	    FREE(*p_token);
+		    "Warning: Invalid configuration entry \"%s\" "
+		    "(entry ignored) at %s:%d\n",
+		    *p_token, filename, *p_line_no);
+	    idx = *p_token;
+	    continue;
 	}
 	return f;
     }
-    
+
     /* We reach this point only when eof has been reached, and there is
      * nothing to return to the caller. */
     fclose(f);
@@ -235,12 +240,13 @@ downcase(char *str)
  * @param options (option_t *) Pointer to our options struct.
  */
 extern void
-read_config_file(options_t *options)
+read_config_file()
 {
     char *filename = NULL;
-    FILE *f = open_config_file(options, &filename);
+    FILE *f = open_config_file(&options, &filename);
     char *token;
     char *value;
+    char *ptr;
     char  c;
     bool  bval;
     int   ival;
@@ -250,8 +256,7 @@ read_config_file(options_t *options)
     while (f &&
 	   (f = next_config_setting(f, &token, &value, &line_no, filename)))
     {
-	printf("Token: %s, Value: \"%s\"\n", token, value);
-	downcase(token);
+        downcase(token);
 	opt_id = get_option(token);
 	if (opt_id >= 0) {
 	    switch (cfg_options[opt_id].option_type) {
@@ -265,14 +270,16 @@ read_config_file(options_t *options)
 		    {
 			fprintf(stderr,
 				"Warning: invalid value (%s) for boolean "
-				"\"%s\" at %s:%d (entry ignored)\n",
+				"\"%s\" (entry ignored) at %s:%d\n",
 				value, token, filename, line_no);
 		    }
 		}
 		break;
 	    case INTEGER:
 		ival = 0;
-		while (c = *value) {
+		ptr = value;
+		while (c = *ptr) {
+		    ptr++;
 		    if ((c >= '0') && (c <= '9')) {
 			ival *= 10;
 			ival += (c - '0');
@@ -280,35 +287,35 @@ read_config_file(options_t *options)
 		    else {
 			fprintf(stderr,
 				"Warning: Invalid value (%s) for integer "
-				"\"%s\" at %s:%d (entry ignored)\n",
+				"\"%s\" (entry ignored) at %s:%d\n",
 				value, token, filename, line_no);
 		    }
 		}
 	    }
 	    switch (opt_id) {
 	    case 0:
-		options->volcurve = bval;
+		options.volcurve = bval;
 		FREE(value);
 		break;
 	    case 1:
-		options->max_pct = ival;
+		options.max_pct = ival;
 		FREE(value);
 		break;
 	    case 2:
-		options->alsa_mixer_name = value;
+		options.alsa_mixer_name = value;
 		break;
 	    case 3:
-		options->mpd_mixer = value;
+		options.mpd_mixer = value;
 		break;
 	    case 4:
-		options->alsa_card = value;
+		options.alsa_card = value;
 		break;
 	    }
 	}
 	else {
 	    fprintf(stderr,
 		    "Warning: Unrecognized token \"%s\" "
-		    "at %s:%d (entry ignored)\n", token, filename, line_no);
+		    "(entry ignored) at %s:%d\n", token, filename, line_no);
 	}
     }
     FREE(filename);

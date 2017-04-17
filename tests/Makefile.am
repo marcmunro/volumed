@@ -2,12 +2,12 @@
 
 TESTS = check_volumed 
 check_PROGRAMS = check_volumed
-check_volumed_SOURCES = check_volumed.c 
-#	$(top_builddir)/src/config.c \
-#	$(wildcard $(top_builddir)/src/*.h)
+check_volumed_SOURCES = check_volumed.c \
+	$(top_builddir)/src/volumed.h
 check_volumed_CFLAGS = @CHECK_CFLAGS@ 
 check_volumed_LDFLAGS = -pthread 
-check_volumed_LDADD = $(top_builddir)/src/params.o @CHECK_LIBS@ -lm -lrt
+check_volumed_LDADD = $(top_builddir)/src/params.o \
+	$(top_builddir)/src/config.o @CHECK_LIBS@ -lm -lrt
 
 # Redefine rules for check-am target so that we can check the output and
 # provide a summary.
@@ -45,15 +45,3 @@ check-am:
 	done; \
 	exit $$exitcode
 
-# Redefine rules for compilation of objects since by default they do
-# not properly handle objects in other directories.
-# This would probably not be an issue except that I want to be able to
-# invoke make check from the tests directory when there may be out of date
-# dependencies in the src (or other directories).  This hack simply fixes
-# the path for the dependencies.  I suspect this whole issue is another
-# example of why recursive make may be considered harmful.
-.c.o:
-	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF \
-	    `dirname $*`/$(DEPDIR)/`basename $*`.Tpo -c -o $@ $<
-	$(AM_V_at)$(am__mv) `dirname $*`/$(DEPDIR)/`basename $*`.Tpo \
-	    `dirname $*`/$(DEPDIR)/`basename $*`.Po

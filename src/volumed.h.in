@@ -77,6 +77,6 @@ extern options_t options;
 extern void closedown(int exitcode);
 extern void dofail(int code, const char *fmt, ...);
 extern void *checked_malloc(size_t size, const char *file, int line);
-extern void read_config_file(options_t *options);
+extern void read_config_file();
 extern void process_args(int argc, char **argv);
 

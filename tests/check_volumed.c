@@ -218,18 +218,11 @@ START_TEST(param_unexpected)
 }
 END_TEST
 
-
-
-static Suite *
-params_suite(void)
+static TCase *
+tcase_params()
 {
-    Suite *s;
-    TCase *tc_params;
-
-    s = suite_create("Volumed");
-    tc_params = tcase_create("params");
+    TCase *tc_params = tcase_create("params");
     tcase_add_checked_fixture(tc_params, redirect_setup, redirect_teardown);
-    suite_add_tcase (s, tc_params);
 
     tcase_add_test(tc_params, param_progname);
     tcase_add_test(tc_params, param_configfile);
@@ -239,11 +232,77 @@ params_suite(void)
     tcase_add_test(tc_params, param_version);
     tcase_add_test(tc_params, param_verbose);
     tcase_add_test(tc_params, param_unexpected);
+
+    return tc_params;
+}
+
+START_TEST(config_base)
+{
+    char *argv[] = {PROGNAME};
+
+    process_args(1, argv);
+    ck_assert(options.config_filename == NULL);
+    ck_assert(options.port == 8888);
+    ck_assert(options.volcurve == true);
+    ck_assert(options.max_pct == 100);
+    ck_assert(strcmp(options.alsa_mixer_name, "Digital") == 0);
+    ck_assert(strcmp(options.mpd_mixer, "hardware") == 0);
+    ck_assert(options.alsa_card == NULL);
+    
+}
+END_TEST
+
+START_TEST(config_tst1)
+{
+    char *argv[] = {PROGNAME,  "-c", "configfile.tst1"};
+    int r1;
+    int r2;
+    
+    redirect(stderr, "stderr.log");
+    process_args(3, argv);
+    read_config_file();
+    fflush(stderr);
+    r1 = system("grep \"Warning: Invalid configuration entry.*VOLCURVE\" "
+		" stderr.log >/dev/null");
+    r2 = system("grep \"Warning: Unrecognized token.*wibble\" "
+		" stderr.log >/dev/null");
+    unlink("stderr.log");
+    ck_assert(strcmp(options.config_filename, "configfile.tst1") == 0);
+    ck_assert(options.port == 8888);
+    ck_assert(options.volcurve == true);
+    ck_assert(options.max_pct == 99);
+    ck_assert(strcmp(options.alsa_mixer_name, "Digital") == 0);
+    ck_assert(strcmp(options.mpd_mixer, "hardware") == 0);
+    ck_assert(strcmp(options.alsa_card, "Bloodnok") == 0);
+    ck_assert_int_eq(r1, 0);  // Check for expected warning no. 1
+    ck_assert_int_eq(r2, 0);  // Check for expected warning no. 2
+
+}
+END_TEST
+
+static TCase *
+tcase_config()
+{
+    TCase *tc_config = tcase_create("config");
+
+    tcase_add_test(tc_config, config_base);
+    tcase_add_test(tc_config, config_tst1);
+
+    return tc_config;
+}
+
+static Suite *
+volumed_suite(void)
+{
+    Suite *s;
+
+    s = suite_create("Volumed");
  
+    suite_add_tcase (s, tcase_params());
+    suite_add_tcase (s, tcase_config());
     return s;
 }
 
-    
 int
 main(int argc, char *argv[])
 {
@@ -251,12 +310,12 @@ main(int argc, char *argv[])
     Suite *s;
     SRunner *sr;
     
-    s = params_suite();
+    s = volumed_suite();
     sr = srunner_create(s);
     
     srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
 
     srunner_free(sr);
-    return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return (number_failed == 0)? EXIT_SUCCESS: EXIT_FAILURE;
 }

@@ -1,0 +1,12 @@
+# Comments should be ignored
+# PORT = 8889
+
+VOLCURVE   # Partial config entry
+
+wibble = wubble # Unrecognisable entry
+
+mpd_mixer = hardware
+alsa_card_name = Bloodnok
+
+MAX_PCT = 97
+Max_PCT = 99
