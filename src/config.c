@@ -193,6 +193,7 @@ static cfg_option_t cfg_options[] = {
     {CFG_NAME_ALSA_MIXER_NAME,  STRING},
     {CFG_NAME_MPD_MIXER,  STRING},
     {CFG_NAME_ALSA_CARD,  STRING},
+    {CFG_NAME_PORT,  INTEGER},
     {NULL, NONE}
 };
 
@@ -309,6 +310,9 @@ read_config_file()
 		break;
 	    case 4:
 		options.alsa_card = value;
+		break;
+	    case 5:
+		options.port = ival;
 		break;
 	    }
 	}

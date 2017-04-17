@@ -19,7 +19,7 @@
 char *progname = NULL;
 
 options_t options = {
-    8888, 			/* default websocket port */
+    CONFIG_PORT,		/* default websocket port */
     0,    			/* default verbosity */
     NULL,			/* config file name */
     CONFIG_VOLCURVE,

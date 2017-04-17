@@ -180,7 +180,6 @@ START_TEST(param_version)
     fflush(my_stdout); 
     dup2(stdout_save, STDOUT_FILENO); //restore the previous state of stdout
 
-    printf("grep " PROGNAME " stdout.log\n");
     r = system(
 	"grep \"" PROGNAME ".*volume control daemon.*"
 	VERSION "\" stdout.log >/dev/null") >> 8;
@@ -280,6 +279,44 @@ START_TEST(config_tst1)
 }
 END_TEST
 
+START_TEST(config_tst2)
+{
+    char *argv[] = {PROGNAME,  "--config=configfile.tst2"};
+    int r1;
+    int r2;
+    
+    process_args(2, argv);
+    read_config_file();
+
+    ck_assert(strcmp(options.config_filename, "configfile.tst2") == 0);
+    ck_assert(options.port == 8889);
+    ck_assert(options.volcurve == false);
+    ck_assert(options.max_pct == 96);
+    ck_assert(strcmp(options.alsa_mixer_name, "Analog") == 0);
+    ck_assert(strcmp(options.mpd_mixer, "software") == 0);
+    ck_assert(options.alsa_card == NULL);
+}
+END_TEST
+
+START_TEST(config_tst3)
+{
+    char *argv[] = {PROGNAME};
+
+    system("cp configfile.tst2 .volumed.conf");
+    process_args(1, argv);
+    read_config_file();
+
+    ck_assert(options.port == 8889);
+    ck_assert(options.volcurve == false);
+    ck_assert(options.max_pct == 96);
+    ck_assert(strcmp(options.alsa_mixer_name, "Analog") == 0);
+    ck_assert(strcmp(options.mpd_mixer, "software") == 0);
+    ck_assert(options.alsa_card == NULL);
+
+    unlink(".volumed.conf");
+}
+END_TEST
+
 static TCase *
 tcase_config()
 {
@@ -287,6 +324,8 @@ tcase_config()
 
     tcase_add_test(tc_config, config_base);
     tcase_add_test(tc_config, config_tst1);
+    tcase_add_test(tc_config, config_tst2);
+    tcase_add_test(tc_config, config_tst3);
 
     return tc_config;
 }

@@ -1,0 +1,9 @@
+# Comments should be ignored
+PORT = 8889
+
+VOLCURVE = No
+
+mpd_mixer = software
+alsa_mixer_name = Analog
+
+MAX_PCT = 96
