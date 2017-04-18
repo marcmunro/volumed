@@ -9,6 +9,11 @@
 *.obj
 *.elf
 
+# Tcov files
+*.gcov
+*.gcda
+*.gcno
+
 # Libraries
 .so
 .a

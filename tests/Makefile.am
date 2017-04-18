@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+AM_CFLAGS = -g -O2 -Wall
+
 TESTS = check_volumed 
 check_PROGRAMS = check_volumed
 check_volumed_SOURCES = check_volumed.c \

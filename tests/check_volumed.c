@@ -246,8 +246,7 @@ START_TEST(config_base)
     ck_assert(options.max_pct == 100);
     ck_assert(strcmp(options.alsa_mixer_name, "Digital") == 0);
     ck_assert(strcmp(options.mpd_mixer, "hardware") == 0);
-    ck_assert(options.alsa_card == NULL);
-    
+    ck_assert(options.alsa_card == NULL);   
 }
 END_TEST
 
@@ -256,6 +255,8 @@ START_TEST(config_tst1)
     char *argv[] = {PROGNAME,  "-c", "configfile.tst1"};
     int r1;
     int r2;
+    int r3;
+    int r4;
     
     redirect(stderr, "stderr.log");
     process_args(3, argv);
@@ -264,6 +265,10 @@ START_TEST(config_tst1)
     r1 = system("grep \"Warning: Invalid configuration entry.*VOLCURVE\" "
 		" stderr.log >/dev/null");
     r2 = system("grep \"Warning: Unrecognized token.*wibble\" "
+		" stderr.log >/dev/null");
+    r3 = system("grep \"invalid value (hellyes)\" "
+		" stderr.log >/dev/null");
+    r4 = system("grep \"nvalid value (s) for integer\" "
 		" stderr.log >/dev/null");
     unlink("stderr.log");
     ck_assert(strcmp(options.config_filename, "configfile.tst1") == 0);
@@ -275,15 +280,14 @@ START_TEST(config_tst1)
     ck_assert(strcmp(options.alsa_card, "Bloodnok") == 0);
     ck_assert_int_eq(r1, 0);  // Check for expected warning no. 1
     ck_assert_int_eq(r2, 0);  // Check for expected warning no. 2
-
+    ck_assert_int_eq(r3, 0);  // Check for expected warning no. 3
+    ck_assert_int_eq(r4, 0);  // Check for expected warning no. 4
 }
 END_TEST
 
 START_TEST(config_tst2)
 {
     char *argv[] = {PROGNAME,  "--config=configfile.tst2"};
-    int r1;
-    int r2;
     
     process_args(2, argv);
     read_config_file();
@@ -317,6 +321,31 @@ START_TEST(config_tst3)
 }
 END_TEST
 
+START_TEST(config_tst4)
+{
+    char *argv[] = {PROGNAME,  "--config=configfile.tst99"};
+    int r;
+    
+    redirect(stderr, "stderr.log");
+    process_args(2, argv);
+    expected_exitcode = 2;
+    read_config_file();
+    fflush(stderr);
+    r = system("grep \"unable to open file:.*configfile.tst99\""
+	       " stderr.log >/dev/null");
+    unlink("stderr.log");
+    
+    ck_assert(strcmp(options.config_filename, "configfile.tst99") == 0);
+    ck_assert(options.port == 8888);
+    ck_assert(options.volcurve == true);
+    ck_assert(options.max_pct == 100);
+    ck_assert(strcmp(options.alsa_mixer_name, "Digital") == 0);
+    ck_assert(strcmp(options.mpd_mixer, "hardware") == 0);
+    ck_assert(options.alsa_card == NULL);
+    ck_assert_int_eq(r, 0);  // Check for expected warning
+}
+END_TEST
+
 static TCase *
 tcase_config()
 {
@@ -326,6 +355,7 @@ tcase_config()
     tcase_add_test(tc_config, config_tst1);
     tcase_add_test(tc_config, config_tst2);
     tcase_add_test(tc_config, config_tst3);
+    tcase_add_test(tc_config, config_tst4);
 
     return tc_config;
 }

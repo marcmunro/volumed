@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glob.h>
+#include <ctype.h>
 #include "volumed.h"
 
 
@@ -230,7 +231,7 @@ static void
 downcase(char *str)
 {
     int i;
-    for (i = strlen(str); i--; i >= 0) {
+    for (i = strlen(str); i >= 0; i--) {
 	str[i] = tolower(str[i]);
     }
 }
@@ -249,8 +250,8 @@ read_config_file()
     char *value;
     char *ptr;
     char  c;
-    bool  bval;
-    int   ival;
+    bool  bval = false;
+    int   ival = 0;
     int   line_no;
     int   opt_id;
     
@@ -279,7 +280,7 @@ read_config_file()
 	    case INTEGER:
 		ival = 0;
 		ptr = value;
-		while (c = *ptr) {
+		while ((c = *ptr)) {
 		    ptr++;
 		    if ((c >= '0') && (c <= '9')) {
 			ival *= 10;
@@ -292,6 +293,8 @@ read_config_file()
 				value, token, filename, line_no);
 		    }
 		}
+	    default:
+		break;
 	    }
 	    switch (opt_id) {
 	    case 0:

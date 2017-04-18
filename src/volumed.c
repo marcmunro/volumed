@@ -39,7 +39,7 @@ It does this by:
 
 /*
  * PLAN:
- *   - complete unit tests
+ *   - test coverage
  *   - valgrind
  *   - create basic websocket service
  *   - create volumec
@@ -70,4 +70,5 @@ main(int argc, char **argv)
 	   options.alsa_mixer_name, options.mpd_mixer);
     printf("alsa_card: %s\n", options.alsa_card);
     closedown(0);
+    return 0;
 }

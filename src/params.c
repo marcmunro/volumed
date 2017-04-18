@@ -44,6 +44,7 @@ checked_malloc(size_t size, const char *file, int line)
 	dofail(2, "Unable to allocate memory of size %d at %s:%d",
 	     size, file, line);
     }
+    return res;
 }
 
 /**

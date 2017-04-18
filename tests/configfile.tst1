@@ -3,10 +3,17 @@
 
 VOLCURVE   # Partial config entry
 
+volcurve = false
+volcurve = no
+volcurve = true
+volcurve = hellyes
+volcurve = yes
+
 wibble = wubble # Unrecognisable entry
 
 mpd_mixer = hardware
 alsa_card_name = Bloodnok
 
+max_pct = s
 MAX_PCT = 97
 Max_PCT = 99
