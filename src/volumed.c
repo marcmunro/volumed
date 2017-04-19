@@ -39,7 +39,7 @@ It does this by:
 
 /*
  * PLAN:
- *   - test coverage
+ *   - test selection parameters for make check
  *   - valgrind
  *   - create basic websocket service
  *   - create volumec
