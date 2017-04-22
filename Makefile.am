@@ -87,6 +87,15 @@ docs:	docs/html
 docs/html: Doxyfile $(SOURCES)
 	doxygen Doxyfile
 
+VALGRIND_BASIC_OPTIONS = --tool=memcheck $(MEMCHECK_OPTIONS) \
+			 --num-callers=20 --track-origins=yes -v \
+			--leak-check=full
+#SUPPRESSION_FILES = $(wildcard valgrind/*_suppressions)
+#MEMCHECK_SUPPRESSIONS = $(SUPPRESSION_FILES:%=--suppressions=%)
+VALGRIND_OPTIONS = $(VALGRIND_BASIC_OPTIONS) #$(MEMCHECK_SUPPRESSIONS)
 
-.PHONY: clean-local mostlyclean-local docs
+grind: $(check_PROGRAMS)
+	valgrind tests/check_volumed
+
+.PHONY: clean-local mostlyclean-local docs grind coverage
 

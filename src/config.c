@@ -246,13 +246,13 @@ read_config_file()
 {
     char *filename = NULL;
     FILE *f = open_config_file(&options, &filename);
-    char *token;
-    char *value;
+    char *token = NULL;
+    char *value = NULL;
     char *ptr;
     char  c;
     bool  bval = false;
     int   ival = 0;
-    int   line_no;
+    int   line_no = 0;
     int   opt_id;
     
     while (f &&

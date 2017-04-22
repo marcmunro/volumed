@@ -39,8 +39,6 @@ It does this by:
 
 /*
  * PLAN:
- *   - test selection parameters for make check
- *   - valgrind
  *   - create basic websocket service
  *   - create volumec
  *   - create volume-config-moode
