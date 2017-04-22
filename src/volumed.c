@@ -29,8 +29,8 @@ It does this by:
   - providing a fully asynchronous interface;
   - accumulating/batching new commands when a command is already
     running;
-  - providing a direct interface to the alsa mixer controls instead
-    of invoking amixer as a shell command.
+  - providing a direct interface to the alsa mixer controls rather
+    than invoking amixer as a shell command.
 */
 
 #define DOCONLY

@@ -1,11 +1,12 @@
 /*
  *     Copyright (c) 2017 Marc Munro
- *     Author:  Marc Munro
  *     License: GPL V3
  *
  * This provides unit tests for volumed.  Unit testing is managed using
  * "check", the unit testing framework for C.
  *
+ * To run specific tests set the environment variable CK_TEST to the 
+ * names of the tests to run, eg: CK_TEST="test1 test7"
  */
 
 
@@ -13,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <check.h>
 #include "../src/volumed.h"
 
@@ -217,20 +219,60 @@ START_TEST(param_unexpected)
 }
 END_TEST
 
+static bool
+strparteq(char *str, char *start, char *end)
+{
+    int len = end - start;
+    if (strncmp(str, start, len) == 0) {
+	return str[len] == '\0';
+    }
+    return false;
+}
+
+static bool
+test_exists_in_var(char *testname, char *tests_var)
+{
+    char *start = tests_var;
+    char *end = tests_var;
+    char c;
+
+    while ((c = *end)) {
+	if (isspace(c)) {
+	    if (strparteq(testname, start, end)) {
+		return true;
+	    }
+	    while ((c = *++end) && isspace(c));
+	    start = end;
+	}
+	else {
+	    end++;
+	}
+    }
+    if (start != end) {
+	return strparteq(testname, start, end);
+    }
+    return false;
+}
+
+#define add_test(tc, tfn, tenv) \
+    if (!tenv || test_exists_in_var(#tfn, tenv)) {	\
+        tcase_add_test(tc, tfn);		\
+    }
+
 static TCase *
-tcase_params()
+tcase_params(char *tests)
 {
     TCase *tc_params = tcase_create("params");
     tcase_add_checked_fixture(tc_params, redirect_setup, redirect_teardown);
 
-    tcase_add_test(tc_params, param_progname);
-    tcase_add_test(tc_params, param_configfile);
-    tcase_add_test(tc_params, param_port);
-    tcase_add_test(tc_params, param_missing_port);
-    tcase_add_test(tc_params, param_missing_config);
-    tcase_add_test(tc_params, param_version);
-    tcase_add_test(tc_params, param_verbose);
-    tcase_add_test(tc_params, param_unexpected);
+    add_test(tc_params, param_progname, tests);
+    add_test(tc_params, param_configfile, tests);
+    add_test(tc_params, param_port, tests);
+    add_test(tc_params, param_missing_port, tests);
+    add_test(tc_params, param_missing_config, tests);
+    add_test(tc_params, param_version, tests);
+    add_test(tc_params, param_verbose, tests);
+    add_test(tc_params, param_unexpected, tests);
 
     return tc_params;
 }
@@ -347,28 +389,28 @@ START_TEST(config_tst4)
 END_TEST
 
 static TCase *
-tcase_config()
+tcase_config(char *tests)
 {
     TCase *tc_config = tcase_create("config");
 
-    tcase_add_test(tc_config, config_base);
-    tcase_add_test(tc_config, config_tst1);
-    tcase_add_test(tc_config, config_tst2);
-    tcase_add_test(tc_config, config_tst3);
-    tcase_add_test(tc_config, config_tst4);
+    add_test(tc_config, config_base, tests);
+    add_test(tc_config, config_tst1, tests);
+    add_test(tc_config, config_tst2, tests);
+    add_test(tc_config, config_tst3, tests);
+    add_test(tc_config, config_tst4, tests);
 
     return tc_config;
 }
 
 static Suite *
-volumed_suite(void)
+volumed_suite(char *tests)
 {
     Suite *s;
 
     s = suite_create("Volumed");
  
-    suite_add_tcase (s, tcase_params());
-    suite_add_tcase (s, tcase_config());
+    suite_add_tcase (s, tcase_params(tests));
+    suite_add_tcase (s, tcase_config(tests));
     return s;
 }
 
@@ -378,8 +420,9 @@ main(int argc, char *argv[])
     int number_failed;
     Suite *s;
     SRunner *sr;
-    
-    s = volumed_suite();
+    char *tests = getenv("CK_TEST");
+
+    s = volumed_suite(tests);
     sr = srunner_create(s);
     
     srunner_run_all(sr, CK_NORMAL);
